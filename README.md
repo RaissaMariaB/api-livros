@@ -212,6 +212,54 @@ curl -X PATCH http://localhost:3000/livros/1 \
 curl -X DELETE http://localhost:3000/livros/1
 ```
 
+### Opção 2b — Testando por terminal na aplicação em produção (Render)
+
+Os mesmos comandos acima, usando a URL pública em vez de `localhost`:
+
+**Listar todos os livros (GET):**
+
+```bash
+curl https://api-livros-9k0q.onrender.com/livros
+```
+
+**Buscar um livro pelo ID (GET):**
+
+```bash
+curl https://api-livros-9k0q.onrender.com/livros/1
+```
+
+**Criar um livro (POST):**
+
+```bash
+curl -X POST https://api-livros-9k0q.onrender.com/livros \
+  -H "Content-Type: application/json" \
+  -d '{"titulo":"Duna","autor":"Frank Herbert","genero":"Ficção Científica","anoPublicacao":1965,"disponivel":true}'
+```
+
+**Atualizar um livro inteiro (PUT):**
+
+```bash
+curl -X PUT https://api-livros-9k0q.onrender.com/livros/1 \
+  -H "Content-Type: application/json" \
+  -d '{"titulo":"O Hobbit - Edição Especial","autor":"J.R.R. Tolkien","genero":"Fantasia","anoPublicacao":1937,"disponivel":false}'
+```
+
+**Atualizar só a disponibilidade (PATCH):**
+
+```bash
+curl -X PATCH https://api-livros-9k0q.onrender.com/livros/1 \
+  -H "Content-Type: application/json" \
+  -d '{"disponivel":true}'
+```
+
+**Remover um livro (DELETE):**
+
+```bash
+curl -X DELETE https://api-livros-9k0q.onrender.com/livros/1
+```
+
+> Use `-w "\nStatus: %{http_code}\n"` em qualquer comando acima para exibir o status HTTP retornado, ex: `curl -w "\nStatus: %{http_code}\n" https://api-livros-9k0q.onrender.com/livros`
+
 ### Verificando o resultado direto no banco de dados
 
 O banco é o arquivo `banco.sqlite` na raiz do projeto. Para visualizar os dados salvos:
@@ -324,5 +372,12 @@ node dist/main
 
 ## Deploy
 
-A aplicação está hospedada no **Render**: `https://api-livros-xxxx.onrender.com`
-Documentação Swagger em produção: `https://api-livros-xxxx.onrender.com/api`
+A aplicação está hospedada no **Render** (Web Service, plano Free, runtime Node):
+
+| Informação | Valor |
+|---|---|
+| **URL da API** | https://api-livros-9k0q.onrender.com |
+| **Swagger em produção** | https://api-livros-9k0q.onrender.com/api |
+| **Repositório conectado** | [RaissaMariaB/api-livros](https://github.com/RaissaMariaB/api-livros) (branch `main`) |
+| **Service ID** | srv-d8stvicm0tmc73blnh4g |
+| **Deploy automático** | A cada `git push` na branch `main`, o Render reconstrói e reinicia o serviço automaticamente |
