@@ -10,6 +10,7 @@ import { LivrosModule } from './livros/livros.module';
       database: 'banco.sqlite',
       entities: [Livro],
       synchronize: true,
+      logging: true,
     }),
     LivrosModule,
   ],
