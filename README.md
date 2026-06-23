@@ -1,104 +1,94 @@
 # API de Livros
 
-API RESTful para gerenciamento de um acervo de livros, desenvolvida com **Node.js** e **NestJS**. Permite criar, listar, atualizar, atualizar parcialmente e remover livros, com documentação interativa via **Swagger**.
+Projeto da disciplina de Computação em Nuvem e Web Services, da Faculdade Nova Roma, cuja proposta era desenvolver uma API RESTful utilizando os verbos HTTP (GET, POST, PUT, PATCH, DELETE), hospedá-la em uma plataforma gratuita e documentá-la adequadamente.
+
+O domínio escolhido foi um sistema de gerenciamento de livros, desenvolvido com **Node.js** e **NestJS**.
+
+A API pode ser testada localmente (`http://localhost:3000`) ou diretamente na versão hospedada em produção (`https://api-livros-9k0q.onrender.com`), por meio do Swagger, do Postman ou de requisições via terminal (curl).
 
 ---
 
-## Sobre o projeto
+## Atributos do livro
 
-O domínio escolhido foi um **sistema de gerenciamento de livros**. Cada livro possui:
-
-| Atributo        | Tipo    | Descrição                                            |
-| --------------- | ------- | ---------------------------------------------------- |
-| `id`            | number  | Identificador único (gerado automaticamente)         |
-| `titulo`        | string  | Título do livro                                      |
-| `autor`         | string  | Autor do livro                                       |
-| `genero`        | string  | Gênero literário (ex: Fantasia, Romance)             |
-| `anoPublicacao` | number  | Ano em que o livro foi publicado                     |
-| `disponivel`    | boolean | Se o livro está disponível para empréstimo           |
-| `criadoEm`      | Date    | Data de criação do registro (gerada automaticamente) |
-
-A API expõe os 5 verbos HTTP principais (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`) sobre o recurso `/livros`.
+- `id`
+- `titulo`
+- `autor`
+- `genero`
+- `anoPublicacao`
+- `disponivel`
+- `criadoEm`
 
 ---
 
-## Tecnologias e por que foram escolhidas
+## Tecnologias utilizadas
 
-| Tecnologia                              | Papel no projeto                   | Por que essa escolha                                                                                                                                     |
-| --------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Node.js**                             | Runtime que executa o servidor     | Padrão de mercado para APIs JavaScript/TypeScript, não-bloqueante e leve                                                                                 |
-| **NestJS**                              | Framework da API                   | Organiza o código em módulos (Controller/Service/Module), tem injeção de dependência nativa e gera documentação Swagger com poucas linhas                |
-| **TypeORM**                             | ORM (mapeamento objeto-relacional) | Permite manipular o banco com objetos TypeScript em vez de escrever SQL manualmente. Integra nativamente com o NestJS via `@nestjs/typeorm`              |
-| **better-sqlite3**                      | Driver do banco de dados           | Banco de dados em arquivo, não exige instalar nem configurar um servidor de banco separado — ideal para hospedagem gratuita e para desenvolvimento local |
-| **class-validator / class-transformer** | Validação dos dados recebidos      | Garante que o corpo das requisições (DTOs) seja validado automaticamente antes de chegar na lógica de negócio (ex: rejeita ano de publicação inválido)   |
-| **@nestjs/swagger**                     | Documentação interativa            | Gera uma página visual em `/api` onde é possível ler e testar todos os endpoints sem precisar de ferramentas externas                                    |
+- **Node.js** — runtime responsável por executar JavaScript/TypeScript no servidor
+- **NestJS** — organiza o projeto em Controller/Service/Module e gera a documentação Swagger automaticamente
+- **TypeORM** — realiza a comunicação com o banco de dados sem a necessidade de escrever SQL manualmente
+- **better-sqlite3** — banco de dados em arquivo único (`banco.sqlite`), sem exigir servidor externo
+- **class-validator** — responsável por validar os dados recebidos nas requisições
+- **@nestjs/swagger** — gera a documentação interativa disponível em `/api`
 
 ---
 
-## Como o projeto funciona (arquitetura)
+## Arquitetura do projeto
 
 ```
-Requisição HTTP
+Requisição chega
       │
       ▼
-Controller   (livros.controller.ts)   → recebe a rota e o método HTTP
+Controller   → recebe a rota e o verbo HTTP (livros.controller.ts)
       │
       ▼
-DTO          (create-livro.dto.ts)    → valida o formato dos dados recebidos
+DTO          → valida o formato dos dados (pasta dto/)
       │
       ▼
-Service      (livros.service.ts)      → contém a lógica de negócio
+Service      → contém a lógica de negócio (livros.service.ts)
       │
       ▼
-Repository   (TypeORM)                → traduz para SQL e acessa o banco
+Repository (TypeORM) → converte em SQL e acessa o banco
       │
       ▼
-banco.sqlite (arquivo do banco)       → onde os dados ficam salvos
+banco.sqlite → onde os dados são persistidos
 ```
 
-- **`src/livros/livro.entity.ts`** — define a estrutura da tabela `livros` no banco.
-- **`src/livros/dto/`** — define o formato esperado de cada tipo de requisição (criação, atualização completa, atualização parcial).
-- **`src/livros/livros.controller.ts`** — define as rotas (`@Get`, `@Post`, `@Put`, `@Patch`, `@Delete`).
-- **`src/livros/livros.service.ts`** — contém os métodos que conversam com o banco via TypeORM.
-- **`src/livros/livros.module.ts`** — agrupa Controller + Service + Entity.
-- **`src/app.module.ts`** — configura a conexão com o banco SQLite.
-- **`src/main.ts`** — inicializa o servidor, ativa validação global e configura o Swagger.
+- `src/livros/livro.entity.ts` — estrutura da tabela
+- `src/livros/dto/` — formatos esperados nas requisições
+- `src/livros/livros.controller.ts` — rotas
+- `src/livros/livros.service.ts` — lógica de negócio
+- `src/livros/livros.module.ts` — agrupa os componentes do módulo
+- `src/app.module.ts` — configuração da conexão com o banco
+- `src/main.ts` — inicialização da aplicação
 
 ---
 
-## Servidor escolhido para hospedagem
+## Hospedagem
 
-A aplicação será hospedada no **[Render](https://render.com)** (plano gratuito), porque:
+A aplicação está hospedada no **[Render](https://render.com)**, plano gratuito, conectado ao repositório no GitHub com deploy automático.
 
-- Conecta direto a um repositório GitHub e faz deploy automático a cada push
-- Não exige cartão de crédito no plano gratuito
-- O arquivo `render.yaml` já está configurado no projeto com o build e start command corretos
-
-Configuração usada (`render.yaml`):
+`render.yaml`:
 
 ```yaml
 buildCommand: npm install && npm run build
 startCommand: node dist/main
 ```
 
-> **Observação:** no plano gratuito do Render o sistema de arquivos é temporário — se o serviço reiniciar, o `banco.sqlite` é resetado. Acredito que para este projeto acadêmico isso é aceitável; em produção real seria usado um banco externo (ex: PostgreSQL).
+> No plano gratuito, o disco é temporário: caso o serviço seja reiniciado, o `banco.sqlite` é resetado.
 
 ---
 
 ## Rotas da API
 
-Base URL local: `http://localhost:3000`
+| Verbo | Rota | Descrição |
+|---|---|---|
+| `GET` | `/livros` | Lista todos os livros |
+| `GET` | `/livros/:id` | Busca um livro específico pelo id |
+| `POST` | `/livros` | Cria um novo livro |
+| `PUT` | `/livros/:id` | Substitui o livro inteiro |
+| `PATCH` | `/livros/:id` | Atualiza apenas a disponibilidade |
+| `DELETE` | `/livros/:id` | Remove o livro |
 
-| Método   | Rota          | Descrição                     | Corpo da requisição                                         | Resposta de sucesso                     |
-| -------- | ------------- | ----------------------------- | ----------------------------------------------------------- | --------------------------------------- |
-| `GET`    | `/livros`     | Lista todos os livros         | —                                                           | `200 OK` + array de livros              |
-| `GET`    | `/livros/:id` | Busca um livro pelo ID        | —                                                           | `200 OK` + livro / `404` se não existir |
-| `POST`   | `/livros`     | Cria um novo livro            | `{ titulo, autor, genero, anoPublicacao, disponivel? }`     | `201 Created` + livro criado            |
-| `PUT`    | `/livros/:id` | Atualiza um livro inteiro     | `{ titulo?, autor?, genero?, anoPublicacao?, disponivel? }` | `200 OK` + livro atualizado / `404`     |
-| `PATCH`  | `/livros/:id` | Atualiza só a disponibilidade | `{ disponivel }`                                            | `200 OK` + livro atualizado / `404`     |
-| `DELETE` | `/livros/:id` | Remove um livro               | —                                                           | `204 No Content` / `404`                |
-
-### Exemplo de requisição (POST)
+### Exemplo — criação de um livro (POST)
 
 ```json
 POST /livros
@@ -111,7 +101,7 @@ POST /livros
 }
 ```
 
-### Exemplo de resposta
+Resposta:
 
 ```json
 {
@@ -127,239 +117,115 @@ POST /livros
 
 ---
 
-## Como rodar o projeto localmente
+## Execução local
 
-### Pré-requisitos
-
-- Node.js instalado (versão 18 ou superior)
-- npm (já vem junto com o Node.js)
-
-### Passos
+Requer Node 18 ou superior.
 
 ```bash
-# 1. instalar as dependências
 npm install
-
-# 2. rodar em modo desenvolvimento (reinicia automaticamente a cada alteração)
 npm run start:dev
 ```
 
-Quando o servidor iniciar, você verá no terminal:
+Ao iniciar, o terminal exibe:
 
 ```
 Aplicação rodando em: http://localhost:3000
 Swagger disponível em: http://localhost:3000/api
 ```
 
-O arquivo **`banco.sqlite`** será criado automaticamente na raiz do projeto na primeira execução — é o banco de dados local (fake/local) usado para os testes.
+O arquivo `banco.sqlite` é criado automaticamente na raiz do projeto na primeira execução.
 
 ---
 
-## Como testar cada rota e ver o resultado no banco
+## Como testar cada rota
 
-Existem duas formas: pelo **Swagger** (mais visual) ou por **linha de comando com curl**.
+### Pelo Swagger
 
-### Opção 1 — Testando pelo Swagger
+1. Com o servidor em execução, acessar `http://localhost:3000/api`
+2. As rotas estão agrupadas em "Livros"
+3. Selecionar a rota desejada e clicar em **Try it out**
+4. Preencher o corpo da requisição (já vem um exemplo preenchido) e clicar em **Execute**
+5. A resposta é exibida abaixo, junto com o status code
 
-1. Com o servidor rodando, acesse `http://localhost:3000/api`
-2. Você verá todas as rotas agrupadas em **Livros**
-3. Clique em uma rota (ex: `POST /livros`) → botão **Try it out**
-4. Preencha o corpo da requisição (já vem um exemplo preenchido)
-5. Clique em **Execute**
-6. O Swagger mostra a resposta da API abaixo, com o status code
-
-### Opção 2 — Testando por terminal (curl)
-
-**Criar um livro (POST):**
+### Pelo terminal (curl) — ambiente local
 
 ```bash
+# criar
 curl -X POST http://localhost:3000/livros \
   -H "Content-Type: application/json" \
   -d '{"titulo":"O Hobbit","autor":"J.R.R. Tolkien","genero":"Fantasia","anoPublicacao":1937,"disponivel":true}'
-```
 
-**Listar todos os livros (GET):**
-
-```bash
+# listar
 curl http://localhost:3000/livros
-```
 
-**Buscar um livro pelo ID (GET):**
-
-```bash
+# buscar um
 curl http://localhost:3000/livros/1
-```
 
-**Atualizar um livro inteiro (PUT):**
-
-```bash
+# atualizar inteiro
 curl -X PUT http://localhost:3000/livros/1 \
   -H "Content-Type: application/json" \
   -d '{"titulo":"O Hobbit - Edição Especial","autor":"J.R.R. Tolkien","genero":"Fantasia","anoPublicacao":1937,"disponivel":false}'
-```
 
-**Atualizar só a disponibilidade (PATCH):**
-
-```bash
+# atualizar só a disponibilidade
 curl -X PATCH http://localhost:3000/livros/1 \
   -H "Content-Type: application/json" \
   -d '{"disponivel":true}'
-```
 
-**Remover um livro (DELETE):**
-
-```bash
+# remover
 curl -X DELETE http://localhost:3000/livros/1
 ```
 
-### Opção 2b — Testando por terminal na aplicação em produção (Render)
-
-Os mesmos comandos acima, usando a URL pública em vez de `localhost`:
-
-**Listar todos os livros (GET):**
+### Pelo terminal (curl) — aplicação hospedada
 
 ```bash
 curl https://api-livros-9k0q.onrender.com/livros
-```
 
-**Buscar um livro pelo ID (GET):**
-
-```bash
-curl https://api-livros-9k0q.onrender.com/livros/1
-```
-
-**Criar um livro (POST):**
-
-```bash
 curl -X POST https://api-livros-9k0q.onrender.com/livros \
   -H "Content-Type: application/json" \
   -d '{"titulo":"Duna","autor":"Frank Herbert","genero":"Ficção Científica","anoPublicacao":1965,"disponivel":true}'
-```
 
-**Atualizar um livro inteiro (PUT):**
-
-```bash
 curl -X PUT https://api-livros-9k0q.onrender.com/livros/1 \
   -H "Content-Type: application/json" \
   -d '{"titulo":"O Hobbit - Edição Especial","autor":"J.R.R. Tolkien","genero":"Fantasia","anoPublicacao":1937,"disponivel":false}'
-```
 
-**Atualizar só a disponibilidade (PATCH):**
-
-```bash
 curl -X PATCH https://api-livros-9k0q.onrender.com/livros/1 \
   -H "Content-Type: application/json" \
   -d '{"disponivel":true}'
-```
 
-**Remover um livro (DELETE):**
-
-```bash
 curl -X DELETE https://api-livros-9k0q.onrender.com/livros/1
 ```
 
-> Use `-w "\nStatus: %{http_code}\n"` em qualquer comando acima para exibir o status HTTP retornado, ex: `curl -w "\nStatus: %{http_code}\n" https://api-livros-9k0q.onrender.com/livros`
+### Pelo Postman
 
-### Verificando o resultado direto no banco de dados
+1. Criar uma Collection (ex.: "API de Livros")
+2. Para cada rota, selecionar o verbo correspondente, informar a URL e, em requisições POST/PUT/PATCH, utilizar a aba **Body → raw → JSON**
+3. Clicar em **Send**
 
-O banco é o arquivo `banco.sqlite` na raiz do projeto. Para visualizar os dados salvos:
+> O Render "dorme" a aplicação após um período de inatividade — a primeira requisição subsequente pode levar de 30 a 50 segundos para responder.
 
-1. Instale a extensão **SQLite Viewer** no VS Code
-2. Clique com o botão direito no arquivo `banco.sqlite` no explorador de arquivos do VS Code
-3. Selecione **Open With SQLite Viewer**
-4. A tabela `livros` aparece com todos os registros — toda vez que você faz um `POST`, `PUT`, `PATCH` ou `DELETE`, basta atualizar essa visualização para ver a mudança refletida no banco
+### Verificando os dados no banco
 
-### Opção 3 — Testando pelo Postman (na aplicação hospedada)
+Extensão **SQLite Viewer** (VS Code): clicar com o botão direito em `banco.sqlite` → **Open With SQLite Viewer**. Após qualquer POST, PUT, PATCH ou DELETE, basta atualizar a visualização para ver a alteração refletida.
 
-Depois que o deploy no Render é feito (conectado ao repositório no GitHub), a API passa a responder em uma URL pública, por exemplo:
-
-```
-https://api-livros-xxxx.onrender.com
-```
-
-Essa é a URL real que deve ser usada no Postman — não é mais `localhost`.
-
-**1. Instalar o Postman**
-Baixe em [postman.com/downloads](https://www.postman.com/downloads/) e crie uma conta gratuita.
-
-**2. Criar uma Collection**
-No menu lateral, clique em **Collections → New Collection** e nomeie como `API de Livros`.
-
-**3. Criar a primeira requisição — GET (listar livros)**
-1. Clique em **Add a request** dentro da collection
-2. Selecione o método **GET** no menu dropdown
-3. Cole a URL: `https://api-livros-xxxx.onrender.com/livros`
-4. Clique em **Send**
-5. O resultado (JSON) aparece na parte inferior da tela
-
-**4. Criar uma requisição POST (criar livro)**
-1. Nova requisição → método **POST**
-2. URL: `https://api-livros-xxxx.onrender.com/livros`
-3. Vá na aba **Body** → selecione **raw** → no dropdown ao lado escolha **JSON**
-4. Cole:
-   ```json
-   {
-     "titulo": "O Hobbit",
-     "autor": "J.R.R. Tolkien",
-     "genero": "Fantasia",
-     "anoPublicacao": 1937,
-     "disponivel": true
-   }
-   ```
-5. Clique em **Send** → deve retornar status `201 Created` com o livro criado
-
-**5. Requisição PUT (atualizar livro inteiro)**
-1. Método **PUT**
-2. URL: `https://api-livros-xxxx.onrender.com/livros/1` (troque `1` pelo id do livro)
-3. Mesma aba **Body → raw → JSON**, com todos os campos:
-   ```json
-   {
-     "titulo": "O Hobbit - Edição Especial",
-     "autor": "J.R.R. Tolkien",
-     "genero": "Fantasia",
-     "anoPublicacao": 1937,
-     "disponivel": false
-   }
-   ```
-4. **Send** → status `200 OK`
-
-**6. Requisição PATCH (atualizar disponibilidade)**
-1. Método **PATCH**
-2. URL: `https://api-livros-xxxx.onrender.com/livros/1`
-3. Body → raw → JSON:
-   ```json
-   { "disponivel": true }
-   ```
-4. **Send** → status `200 OK`
-
-**7. Requisição DELETE (remover livro)**
-1. Método **DELETE**
-2. URL: `https://api-livros-xxxx.onrender.com/livros/1`
-3. Sem body
-4. **Send** → status `204 No Content`
-
-**8. Salvar tudo na Collection**
-Depois de cada `Send`, clique em **Save** (canto superior direito da requisição) para guardar dentro da Collection. Assim você monta uma coleção completa com as 6 requisições (GET all, GET by id, POST, PUT, PATCH, DELETE) — útil para a demonstração em aula ou no vídeo de entrega.
-
-> **Dica:** como o plano gratuito do Render "dorme" a aplicação após um tempo sem uso, a primeira requisição depois de um período de inatividade pode demorar uns 30-50 segundos para responder (o servidor está "acordando"). Isso é normal.
+A opção `logging: true` está habilitada na configuração do TypeORM (`app.module.ts`), exibindo no terminal cada query SQL executada durante a operação do servidor.
 
 ---
 
 ## Testes realizados
 
-Durante o desenvolvimento, os seguintes testes manuais foram executados via terminal (curl) e Swagger para validar o funcionamento de cada verbo HTTP:
+Cada rota foi testada manualmente durante o desenvolvimento, tanto no ambiente local quanto após a hospedagem:
 
-| Teste                                    | Verbo                | Resultado esperado                                    | Status    |
-| ---------------------------------------- | -------------------- | ----------------------------------------------------- | --------- |
-| Listar livros sem nenhum cadastro        | `GET /livros`        | Retorna `[]` com status `200`                         | ✅ Passou |
-| Criar livro com dados válidos            | `POST /livros`       | Retorna o livro criado com status `201`               | ✅ Passou |
-| Criar livro com ano inválido (ex: texto) | `POST /livros`       | Retorna erro de validação `400`                       | ✅ Passou |
-| Buscar livro existente pelo ID           | `GET /livros/:id`    | Retorna o livro com status `200`                      | ✅ Passou |
-| Buscar livro inexistente pelo ID         | `GET /livros/:id`    | Retorna `404 Not Found`                               | ✅ Passou |
-| Atualizar livro existente                | `PUT /livros/:id`    | Retorna livro atualizado com status `200`             | ✅ Passou |
-| Atualizar disponibilidade                | `PATCH /livros/:id`  | Retorna livro com `disponivel` alterado, status `200` | ✅ Passou |
-| Remover livro existente                  | `DELETE /livros/:id` | Retorna status `204`, sem corpo                       | ✅ Passou |
-| Remover livro inexistente                | `DELETE /livros/:id` | Retorna `404 Not Found`                               | ✅ Passou |
+| Teste | Verbo | Resultado esperado | Status |
+|---|---|---|---|
+| Listar sem nenhum livro cadastrado | GET /livros | Retorna `[]` | ✅ |
+| Criar livro com dados válidos | POST /livros | Retorna o livro criado, status 201 | ✅ |
+| Criar livro com ano inválido | POST /livros | Retorna erro de validação, status 400 | ✅ |
+| Buscar livro existente | GET /livros/:id | Retorna o livro, status 200 | ✅ |
+| Buscar livro inexistente | GET /livros/:id | Status 404 | ✅ |
+| Atualizar livro existente | PUT /livros/:id | Retorna o livro atualizado, status 200 | ✅ |
+| Atualizar apenas a disponibilidade | PATCH /livros/:id | Altera somente esse campo, status 200 | ✅ |
+| Remover livro existente | DELETE /livros/:id | Status 204, sem corpo | ✅ |
+| Remover livro inexistente | DELETE /livros/:id | Status 404 | ✅ |
 
 ---
 
@@ -372,21 +238,16 @@ node dist/main
 
 ## Deploy
 
-A aplicação está hospedada no **Render** (Web Service, plano Free, runtime Node):
-
 | Informação | Valor |
 |---|---|
-| **URL da API** | https://api-livros-9k0q.onrender.com |
-| **Swagger em produção** | https://api-livros-9k0q.onrender.com/api |
-| **Repositório conectado** | [RaissaMariaB/api-livros](https://github.com/RaissaMariaB/api-livros) (branch `main`) |
-| **Service ID** | srv-d8stvicm0tmc73blnh4g |
-| **Deploy automático** | A cada `git push` na branch `main`, o Render reconstrói e reinicia o serviço automaticamente |
+| URL da API | https://api-livros-9k0q.onrender.com |
+| Swagger em produção | https://api-livros-9k0q.onrender.com/api |
+| Repositório | [RaissaMariaB/api-livros](https://github.com/RaissaMariaB/api-livros) |
+| Deploy automático | A cada push na branch `main`, o Render reconstrói e reinicia o serviço |
 
-### O que realmente reflete no Render a cada push
-
-| Mudança | Aparece no Render? |
+| Alteração | Reflete no Render? |
 |---|---|
-| Código (`src/*.ts`) | Sim — novo deploy, app reinicia com o código atualizado |
-| `render.yaml` | Sim — pode até mudar a configuração do build/start |
-| Só `README.md` | Dispara deploy, mas nada muda no comportamento da API |
-| Dados no `banco.sqlite` (via POST/PUT/etc) | **Não aparece no Render** — é o conteúdo do banco, não o código. Só é visível testando a API (curl/Postman/Swagger) |
+| Código (`src/*.ts`) | Sim — novo build e reinício com o código atualizado |
+| `render.yaml` | Sim — pode alterar a configuração de build/start |
+| Apenas o README | Dispara um novo deploy, mas não altera o comportamento da API |
+| Dados inseridos via POST/PUT/etc | Não aparecem no painel do Render — são conteúdo do banco, não código. Só podem ser verificados testando a própria API (curl, Postman ou Swagger) |
