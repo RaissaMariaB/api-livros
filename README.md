@@ -381,3 +381,12 @@ A aplicação está hospedada no **Render** (Web Service, plano Free, runtime No
 | **Repositório conectado** | [RaissaMariaB/api-livros](https://github.com/RaissaMariaB/api-livros) (branch `main`) |
 | **Service ID** | srv-d8stvicm0tmc73blnh4g |
 | **Deploy automático** | A cada `git push` na branch `main`, o Render reconstrói e reinicia o serviço automaticamente |
+
+### O que realmente reflete no Render a cada push
+
+| Mudança | Aparece no Render? |
+|---|---|
+| Código (`src/*.ts`) | Sim — novo deploy, app reinicia com o código atualizado |
+| `render.yaml` | Sim — pode até mudar a configuração do build/start |
+| Só `README.md` | Dispara deploy, mas nada muda no comportamento da API |
+| Dados no `banco.sqlite` (via POST/PUT/etc) | **Não aparece no Render** — é o conteúdo do banco, não o código. Só é visível testando a API (curl/Postman/Swagger) |
